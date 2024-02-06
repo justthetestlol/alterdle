@@ -20,6 +20,7 @@ export const HARD_MODE_RESTRICTION_MESSAGE =
 export const HARD_MODE_DESCRIPTION =
   'Any revealed hints must be used in subsequent guesses'
 export const HIGH_CONTRAST_MODE_DESCRIPTION = 'For improved color vision'
+export const DARK_MODE_DESCRIPTION = 'Dark mode, easier on the eyes. Sort of brownish.'
 export const CHALLENGES_DESCRIPTION = 'Number of words to guess at once'
 export const LENGTH_DESCRIPTION = 'Length of each word'
 export const CORRECT_WORD_MESSAGE = (solution: string[]) => {
