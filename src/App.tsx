@@ -4,6 +4,7 @@ import { default as GraphemeSplitter } from 'grapheme-splitter'
 import { useEffect, useMemo, useState } from 'react'
 import Div100vh from 'react-div-100vh'
 
+
 import { AlertContainer } from './components/alerts/AlertContainer'
 import { Grid } from './components/grid/Grid'
 import { Keyboard } from './components/keyboard/Keyboard'
@@ -481,5 +482,7 @@ function App() {
     </Div100vh>
   )
 }
+
+<Analytics />
 
 export default App
