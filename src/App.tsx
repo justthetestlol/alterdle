@@ -3,6 +3,7 @@ import { format } from 'date-fns'
 import { default as GraphemeSplitter } from 'grapheme-splitter'
 import { useEffect, useMemo, useState } from 'react'
 import Div100vh from 'react-div-100vh'
+import { Analytics } from '@vercel/analytics/react';
 
 
 import { AlertContainer } from './components/alerts/AlertContainer'
