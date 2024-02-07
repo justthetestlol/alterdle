@@ -1,4 +1,4 @@
-import { ClockIcon, ShareIcon } from '@heroicons/react/outline'
+import { ClockIcon } from '@heroicons/react/outline' // remember "ShareIcon"
 import { format } from 'date-fns'
 import Countdown from 'react-countdown'
 
@@ -17,11 +17,11 @@ import {
   GUESS_DISTRIBUTION_TEXT,
   LENGTH_DESCRIPTION,
   NEW_WORD_TEXT,
-  SHARE_TEXT,
+  // SHARE_TEXT,
   STATISTICS_TITLE,
 } from '../../constants/strings'
 import { getToday } from '../../lib/dateutils'
-import { shareStatus } from '../../lib/share'
+ // import { shareStatus } from '../../lib/share'
 import {
   Obj2d,
   checkIsGameWon,
@@ -148,7 +148,7 @@ export const StatsModal = ({
                 </div>
               )}
             </div>
-            <div>
+            {/* <div>
               <button
                 type="button"
                 className="accent-button-large"
@@ -166,12 +166,13 @@ export const StatsModal = ({
                     numberOfWords,
                     numberOfLetters
                   )
-                }}
-              >
+                }} */}
+              {/* >
                 <ShareIcon className="mr-2 h-6 w-6 cursor-pointer dark:stroke-white" />
                 {SHARE_TEXT}
               </button>
             </div>
+          </div> */}
           </div>
         )}
         {ENABLE_MIGRATE_STATS && (
