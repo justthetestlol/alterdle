@@ -1,9 +1,8 @@
-import { ClockIcon } from '@heroicons/react/outline'
+import { CalendarIcon } from '@heroicons/react/outline'
 import { format } from 'date-fns'
 import { default as GraphemeSplitter } from 'grapheme-splitter'
 import { useEffect, useMemo, useState } from 'react'
 import Div100vh from 'react-div-100vh'
-
 
 import { AlertContainer } from './components/alerts/AlertContainer'
 import { Grid } from './components/grid/Grid'
@@ -44,24 +43,30 @@ import {
   setStoredIsHighContrastMode,
 } from './lib/localStorage'
 import { addStatsForCompletedGame, loadStats } from './lib/stats'
-import { loadNumberOfLetters, loadNumberOfWords, setUrl } from './lib/urlutils'
+import {
+  loadGameDate,
+  loadNumberOfLetters,
+  loadNumberOfWords,
+  setUrl,
+} from './lib/urlutils'
 import {
   Obj2d,
   checkIsGameWon,
   countGridsWon,
   findFirstUnusedReveal,
-  getGameDate,
   getIsLatestGame,
   getSolution,
   isWordInWordList,
-  setGameDate,
+  loadGuesses,
   unicodeLength,
   updateObj2d,
 } from './lib/words'
 
 function App() {
-  const isLatestGame = getIsLatestGame()
-  const gameDate = getGameDate()
+  const [gameDate, setGameDate] = useState<Date>(() => {
+    return loadGameDate()
+  })
+  const isLatestGame = useMemo(() => getIsLatestGame(gameDate), [gameDate])
   const prefersDarkMode = window.matchMedia(
     '(prefers-color-scheme: dark)'
   ).matches
@@ -79,11 +84,15 @@ function App() {
     localStorage.getItem('theme')
       ? localStorage.getItem('theme') === 'dark'
       : prefersDarkMode
-      ? true
-      : false
+        ? true
+        : false
   )
   const [isHighContrastMode, setIsHighContrastMode] = useState(
     getStoredIsHighContrastMode()
+  )
+
+  const [longShare, setLongShare] = useState(
+    localStorage.getItem('longShare') === 'true'
   )
   const [isRevealing, setIsRevealing] = useState(false)
 
@@ -101,16 +110,11 @@ function App() {
   const maxChallenges = numberOfWords + MAX_CHALLENGES_BONUS
 
   const solution = useMemo(
-    () =>
-      getSolution(getGameDate(), numberOfWords, numberOfLetters).newSolution,
-    [numberOfWords, numberOfLetters]
+    () => getSolution(gameDate, numberOfWords, numberOfLetters).newSolution,
+    [numberOfWords, numberOfLetters, gameDate]
   )
   const [guesses, setGuesses] = useState<Obj2d>(() => {
-    const loaded = loadGameStateFromLocalStorage(isLatestGame)
-    if (loaded?.gameDate.getTime() !== getGameDate().getTime()) {
-      return {}
-    }
-    return loaded.guesses
+    return loadGuesses(gameDate, isLatestGame)
   })
 
   const [currentGuesses, setCurrentGuesses] = useState<Obj2d>({})
@@ -124,24 +128,35 @@ function App() {
       : false
   )
   const isHardMode = isHardModeRequested && numberOfWords === 1
+  // TODO hard mode can be enabled after the start of the game if the user changes settings.
+  // TODO dont show invalid words in hard mode
+  // TODO disable hard mode toggle (make it look disabled)
 
   useEffect(() => {
     // if no game state on load,
     // show the user the how-to info modal
-    if (!loadGameStateFromLocalStorage(true)) {
+    if (
+      !loadGameStateFromLocalStorage(true) &&
+      !loadGameStateFromLocalStorage(false)
+    ) {
       setTimeout(() => {
         setIsHelpModalOpen(true)
       }, WELCOME_HELP_MODAL_MS)
     }
-  })
+  }, [])
 
   useEffect(() => {
-    // Ensure only 2 challenges can played at once with 2 letters
+    // Ensures only 2 challenges can played at once with 2 letters
     if (numberOfLetters === 1 && numberOfWords > 2) {
       setNumberOfWords(2)
     }
-    setUrl(numberOfWords, numberOfLetters)
-  }, [numberOfLetters, numberOfWords])
+    setUrl(numberOfWords, numberOfLetters, gameDate)
+    // TODO change to useReducer() maybe. it could reduce chance of "Too many calls to Location or History APIs within a short timeframe" error
+  }, [numberOfLetters, numberOfWords, gameDate])
+
+  useEffect(() => {
+    setGuesses(loadGuesses(gameDate, isLatestGame))
+  }, [gameDate, isLatestGame])
 
   useEffect(() => {
     DISCOURAGE_INAPP_BROWSERS &&
@@ -165,6 +180,11 @@ function App() {
       document.documentElement.classList.remove('high-contrast')
     }
   }, [isDarkMode, isHighContrastMode])
+
+  const handleLongShare = (isLongShare: boolean) => {
+    setLongShare(isLongShare)
+    localStorage.setItem('longShare', isLongShare.toString())
+  }
 
   const handleDarkMode = (isDark: boolean) => {
     setIsDarkMode(isDark)
@@ -197,11 +217,11 @@ function App() {
   }
 
   useEffect(() => {
-    saveGameStateToLocalStorage(getIsLatestGame(), {
+    saveGameStateToLocalStorage(isLatestGame, {
       guesses: guesses,
-      gameDate: getGameDate(),
+      gameDate: gameDate,
     })
-  }, [guesses])
+  }, [guesses, gameDate, isLatestGame])
 
   const onChar = (value: string) => {
     if (
@@ -368,21 +388,22 @@ function App() {
           setIsInfoModalOpen={setIsInfoModalOpen}
           setIsHelpModalOpen={setIsHelpModalOpen}
           setIsStatsModalOpen={setIsStatsModalOpen}
-          setIsDatePickerModalOpen={setIsDatePickerModalOpen}
           setIsSettingsModalOpen={setIsSettingsModalOpen}
+          numberOfLetters={numberOfLetters}
+          numberOfWords={numberOfWords}
         />
 
         {!isLatestGame && (
-          <div className="flex items-center justify-center">
-            <ClockIcon className="h-6 w-6 stroke-gray-600 dark:stroke-gray-300" />
-            <p className="text-base text-gray-600 dark:text-gray-300">
+          <div className="mb-1 flex items-center justify-center">
+            <CalendarIcon className="h-6 w-6 stroke-gray-600 dark:stroke-gray-300" />
+            <p className="ml-1 text-base text-gray-600 dark:text-gray-300">
               {format(gameDate, 'd MMMM yyyy', { locale: DATE_LOCALE })}
             </p>
           </div>
         )}
 
         <div className="mx-auto flex w-full grow flex-col pb-8 short:pb-2 short:pt-2">
-          <div className="no-scrollbar flex h-[1vh] grow flex-wrap items-center justify-center overflow-y-auto">
+          <div className="flex h-[1vh] grow flex-wrap items-start justify-center overflow-y-auto">
             {solution.map((sol: any, i: any) => (
               <Grid
                 key={i}
@@ -392,10 +413,12 @@ function App() {
                 isRevealing={isRevealing}
                 currentRowClassName={currentRowClass}
                 maxChallenges={maxChallenges}
+                numberOfLetters={numberOfLetters}
+                numberOfWords={numberOfWords}
               />
             ))}
           </div>
-          <div className="px-1 pt-5">
+          <div className="px-1 pt-5 sm:pt-2 short:pt-2">
             <Keyboard
               onChar={onChar}
               onDelete={onDelete}
@@ -448,19 +471,29 @@ function App() {
             numberOfLetters={numberOfLetters}
             handleNumberOfLetters={setNumberOfLetters}
             maxChallenges={maxChallenges}
+            gameDate={gameDate}
+            longShare={longShare}
           />
           <DatePickerModal
             isOpen={isDatePickerModalOpen}
-            initialDate={getGameDate()}
+            initialDate={gameDate}
             handleSelectDate={(d) => {
               setIsDatePickerModalOpen(false)
               setGameDate(d)
+              setUrl(numberOfWords, numberOfLetters, d)
+              setIsSettingsModalOpen(false)
             }}
-            handleClose={() => setIsDatePickerModalOpen(false)}
+            handleClose={() => {
+              setIsSettingsModalOpen(true)
+              setIsDatePickerModalOpen(false)
+            }}
           />
           <MigrateStatsModal
             isOpen={isMigrateStatsModalOpen}
-            handleClose={() => setIsMigrateStatsModalOpen(false)}
+            handleClose={() => {
+              setIsSettingsModalOpen(true)
+              setIsMigrateStatsModalOpen(false)
+            }}
           />
           <SettingsModal
             isOpen={isSettingsModalOpen}
@@ -475,6 +508,16 @@ function App() {
             handleNumberOfWords={setNumberOfWords}
             numberOfLetters={numberOfLetters}
             handleNumberOfLetters={setNumberOfLetters}
+            handleChooseDateButton={() => {
+              setIsDatePickerModalOpen(true)
+              setIsSettingsModalOpen(false)
+            }}
+            handleMigrateStatsButton={() => {
+              setIsSettingsModalOpen(false)
+              setIsMigrateStatsModalOpen(true)
+            }}
+            longShare={longShare}
+            handleLongShare={handleLongShare}
           />
           <AlertContainer />
         </div>

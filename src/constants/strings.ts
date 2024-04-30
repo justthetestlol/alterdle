@@ -9,10 +9,18 @@ export const WIN_MESSAGES = [
   'Excellent',
   'Sweet!',
   'Brilliant',
+  'Sweet as',
+  'cool beans',
+  'Awesome sauce',
+  'Fantastic work!',
+  'Sublime',
+  'Outstanding performance',
+  'Superb',
 ]
-export const GAME_COPIED_MESSAGE = 'Game copied to clipboard'
+export const GAME_COPIED_MESSAGE = 'Copied to clipboard'
 export const NOT_ENOUGH_LETTERS_MESSAGE = 'Not enough letters'
 export const WORD_NOT_FOUND_MESSAGE = 'Word not found'
+export const LONG_SHARE_DESCRIPTION = 'Share text will contain details of every guess of every word'
 export const HARD_MODE_CHEATING_MESSAGE =
   'Hard Mode can be enabled only at the start'
 export const HARD_MODE_RESTRICTION_MESSAGE =
@@ -21,7 +29,7 @@ export const HARD_MODE_DESCRIPTION =
   'Any revealed hints must be used in subsequent guesses'
 export const HIGH_CONTRAST_MODE_DESCRIPTION = 'For improved color vision'
 export const DARK_MODE_DESCRIPTION = 'Dark mode, easier on the eyes. Sort of brownish.'
-export const CHALLENGES_DESCRIPTION = 'Number of words to guess at once'
+export const CHALLENGES_DESCRIPTION = 'How many words to guess'
 export const LENGTH_DESCRIPTION = 'Length of each word'
 export const CORRECT_WORD_MESSAGE = (solution: string[]) => {
   const sol = [...solution]
@@ -45,7 +53,7 @@ export const SHARE_FAILURE_TEXT =
   'Unable to share the results. This feature is available only in secure contexts (HTTPS), in some or all supporting browsers.'
 export const MIGRATE_BUTTON_TEXT = 'Transfer'
 export const MIGRATE_DESCRIPTION_TEXT =
-  'Click here to transfer your statistics to a new device.'
+  'Transfer your statistics to a new device.'
 export const TOTAL_TRIES_TEXT = 'Total tries'
 export const SUCCESS_RATE_TEXT = 'Success rate'
 export const CURRENT_STREAK_TEXT = 'Current streak'
@@ -53,7 +61,10 @@ export const BEST_STREAK_TEXT = 'Best streak'
 export const DISCOURAGE_INAPP_BROWSER_TEXT =
   "You are using an embedded browser and may experience problems sharing or saving your results. We encourage you rather to use your device's default browser."
 
-export const DATEPICKER_TITLE = 'Choose a past date'
-export const DATEPICKER_CHOOSE_TEXT = 'Choose'
-export const DATEPICKER_TODAY_TEXT = 'today'
+export const DATEPICKER_TITLE = 'Play a Previous Alterdle'
+export const DATEPICKER_CHOOSE_TEXT = 'Play'
+export const DATEPICKER_TODAY_TEXT = "today's Alterdle"
 export const ARCHIVE_GAMEDATE_TEXT = 'Game date'
+export const DATEPICKER_DESCRIPTION = 
+  'Play an Alterdle game from a paste date at any setting'
+export const DATEPICKER_BUTTON = 'Choose Date'

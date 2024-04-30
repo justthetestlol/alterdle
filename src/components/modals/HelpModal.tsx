@@ -156,7 +156,7 @@ export const HelpModal = ({
     cellStatus: CharStatus
   ) => {
     const wordCells = (
-      <div className="mb-1 mt-4 flex justify-center">
+      <div className="mb-1 mt-2 flex justify-center">
         {word.split('').map((c, i) => (
           <Cell
             key={i}
@@ -164,6 +164,7 @@ export const HelpModal = ({
             value={c.toUpperCase()}
             isCompleted={true}
             status={indices.indexOf(i) > -1 ? cellStatus : 'null'}
+            helpModal={true}
           />
         ))}
       </div>
